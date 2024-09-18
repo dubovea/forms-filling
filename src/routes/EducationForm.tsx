@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/shared/form";
 import { FormInputFiles } from "@/components/shared/form/form-input-files";
 import { Container } from "@/components/shared/container";
-import { applicationFormInitial, applicationFormSchema } from "@/lib/schema";
+import { applicationFormSchema, educationFormInitial } from "@/lib/schema";
 import emailjs from "emailjs-com";
 import toast from "react-hot-toast";
 
-export default function ApplicationForm() {
+export default function EducationForm() {
   const methods = useForm({
     resolver: zodResolver(applicationFormSchema),
-    defaultValues: applicationFormInitial,
+    defaultValues: educationFormInitial,
     mode: "onChange",
   });
 
@@ -27,13 +27,13 @@ export default function ApplicationForm() {
     control,
   });
 
-  const onSubmit = (data: typeof applicationFormInitial) => {
+  const onSubmit = (data: typeof educationFormInitial) => {
     const sMessage = Object.values(data.fields).reduce((acc, val) => {
       acc += `${val.label}: ${val.value}\n`;
       return acc;
     }, "");
     const contactdetail = {
-      title: "Заявка на вступление в Студеческие отряды Югры",
+      title: "Информация об образовательной организации",
       from_name: "Эдик",
       to_name: "Тимур",
       reply_to: "shadowfiendyaphetz@gmail.com",
@@ -61,7 +61,7 @@ export default function ApplicationForm() {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <h2 className="text-xl font-bold mb-4">
-            Заявка на вступление в Студеческие отряды Югры
+            Информация об образовательной организации
           </h2>
           {fields.map((field, index) => (
             <FormInput

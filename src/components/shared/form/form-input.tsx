@@ -2,22 +2,10 @@ import { Input } from "../../ui/input";
 import { ErrorText } from "../error-text";
 import { RequiredSymbol } from "../required-symbol";
 import { ClearButton } from "../clear-button";
-import { Calendar } from "@/components/ui/calendar";
-import { FormControl } from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useEffect } from "react";
-import { isDate } from "date-fns";
 import { FormCalendar } from "./form-calendar";
-import { PhoneInput } from "@/components/ui/phone-input";
 import { Controller } from "react-hook-form";
-import { Checkbox } from "@/components/ui/checkbox";
+import { FormInputCheckbox } from "./form-input-checkbox";
+import { FormInputPhone } from "./form-input-phone";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   control: any;
@@ -46,12 +34,16 @@ export const FormInput: React.FC<Props> = ({
   };
 
   const isStatusField = type === "status";
+  const isNumberField = type === "number";
   const isTextField =
-    type === "text" || type === "email" || isStatusField || !type;
+    type === "text" ||
+    isNumberField ||
+    type === "email" ||
+    isStatusField ||
+    !type;
   const isDateField = type === "date";
   const isPhoneField = type === "phone";
   const isCheckBoxField = type === "checkbox";
-  const isFileField = type === "file";
 
   return (
     <div className={className}>
@@ -61,21 +53,7 @@ export const FormInput: React.FC<Props> = ({
         </p>
       )}
       {label && isCheckBoxField && (
-        <div className="flex items-center gap-2 justify-between">
-          <p className="font-medium mb-2">
-            {label} {required && <RequiredSymbol />}
-          </p>
-          <Controller
-            name={name}
-            control={control}
-            render={({ field }) => (
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-            )}
-          />
-        </div>
+        <FormInputCheckbox control={control} name={name} label={label} />
       )}
       <div className="relative">
         {isTextField && (
@@ -84,6 +62,7 @@ export const FormInput: React.FC<Props> = ({
             control={control}
             render={({ field }) => (
               <Input
+                type={isNumberField ? "number" : "text"}
                 disabled={isStatusField}
                 className="h-12 text-md"
                 {...field}
@@ -99,22 +78,7 @@ export const FormInput: React.FC<Props> = ({
             render={({ field }) => <FormCalendar field={field} />}
           />
         )}
-        {isPhoneField && (
-          <Controller
-            name={name}
-            control={control}
-            render={({ field }) => (
-              <PhoneInput
-                className="h-12 text-md"
-                defaultCountry="RU"
-                countries={["RU"]}
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
-        )}
-        
+        {isPhoneField && <FormInputPhone control={control} name={name} />}
 
         {isTextField && (
           <ClearButton disabled={isStatusField} onClick={onClickClear} />
