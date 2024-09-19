@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { sendMail } from "@/lib/mail";
 import { Link, useNavigate } from "react-router-dom";
 import { Undo } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function EducationForm() {
   const navigate = useNavigate();
