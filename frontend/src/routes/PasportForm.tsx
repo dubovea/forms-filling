@@ -4,14 +4,18 @@ import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/shared/form";
 import { FormInputFiles } from "@/components/shared/form/form-input-files";
 import { Container } from "@/components/shared/container";
-import { applicationFormInitial, applicationFormSchema } from "@/lib/schema";
-import emailjs from "emailjs-com";
+import { applicationFormSchema, pasportFormInitial } from "@/lib/schema";
 import toast from "react-hot-toast";
+import { sendMail } from "@/lib/mail";
+import { Link, useNavigate } from "react-router-dom";
+import { Undo } from "lucide-react";
 
-export default function ApplicationForm() {
+export default function PasportForm() {
+  const navigate = useNavigate();
+  
   const methods = useForm({
     resolver: zodResolver(applicationFormSchema),
-    defaultValues: applicationFormInitial,
+    defaultValues: pasportFormInitial,
     mode: "onChange",
   });
 
@@ -27,48 +31,32 @@ export default function ApplicationForm() {
     control,
   });
 
-  const onSubmit = (data: typeof applicationFormInitial) => {
-    const sMessage = Object.values(data.fields).reduce((acc, val) => {
-      acc += `${val.label}: ${val.value}\n`;
-      return acc;
-    }, "");
-    const contactdetail = {
-      title: "Заявка на вступление в Студеческие отряды Югры",
-      from_name: "Эдик",
-      to_name: "Тимур",
-      reply_to: "shadowfiendyaphetz@gmail.com",
-      message: sMessage,
-    };
-    emailjs
-      .send(
-        "service_98rg1t9", // ID сервиса из панели управления EmailJS
-        "template_n85bdbw", // ID шаблона из панели управления EmailJS
-        contactdetail, // Форма для отправки
-        "kPvESNPnevt2e7XH0" // Пользовательский ID из EmailJS
-      )
-      .then(
-        () => {
-          toast.success("Заявка отправлена!");
-        },
-        (error) => {
-          toast.error(error.text);
-        }
-      );
+  const onSubmit = async (data: typeof pasportFormInitial) => {
+    const response = await sendMail({
+      data,
+      title: "Паспортные данные",
+    });
+    toast.success(response);
+    navigate("/");
   };
 
   return (
     <Container className="mt-4 p-4">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <h2 className="text-xl font-bold mb-4">
-            Заявка на вступление в Студеческие отряды Югры
-          </h2>
+          <div className="flex flex-row">
+            <Link to="/" className="text-white">
+              <Undo />
+            </Link>
+            <h2 className="text-xl font-bold mb-4 ml-2">Паспортные данные</h2>
+          </div>
           {fields.map((field, index) => (
             <FormInput
               className="mb-4"
               key={field.field}
               label={field.label}
               name={`fields.${index}.value`}
+              values={field.values}
               type={field.type}
               setValue={setValue}
               control={control}

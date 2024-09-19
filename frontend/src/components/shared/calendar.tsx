@@ -1,4 +1,4 @@
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { FormControl } from "@/components/ui/form";
 import {
   Popover,
@@ -8,6 +8,7 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import moment from "moment";
 import { useState } from "react";
 
 interface Props {
@@ -17,10 +18,10 @@ interface Props {
   };
 }
 
-export const FormCalendar: React.FC<Props> = ({ field }) => {
+export const Calendar: React.FC<Props> = ({ field }) => {
   const { value, onChange } = field;
   const [isOpen, setIsOpen] = useState(false);
-
+  const defaultDate = value ? moment(value, "DD.MM.YYYY") : undefined;
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
     onChange(date.toLocaleDateString()); // Форматируем дату в строку
@@ -33,7 +34,7 @@ export const FormCalendar: React.FC<Props> = ({ field }) => {
         <FormControl>
           <Button
             variant={"outline"}
-            className={cn("h-12 pl-3 text-left font-normal w-full")}
+            className={cn("h-12 pl-3 text-left text-md w-full justify-start")}
           >
             {value ?? value}
             <CalendarIcon className="h-5 w-5 cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 opacity-30 hover:opacity-100" />
@@ -41,9 +42,9 @@ export const FormCalendar: React.FC<Props> = ({ field }) => {
         </FormControl>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
+        <CalendarUI
           mode="single"
-          selected={value ? new Date(value) : undefined}
+          selected={defaultDate}
           onSelect={handleDateSelect}
           captionLayout="dropdown-buttons"
           fromYear={1950}

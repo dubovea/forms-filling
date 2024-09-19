@@ -9,10 +9,10 @@ export const formPaths = [
   },
   {
     title: "Паспортные данные",
-    route: "/application-form",
+    route: "/pasport-form",
   },
   {
     title: "Для участия в трудовых проектах",
-    route: "/application-form",
+    route: "/work-form",
   },
 ];

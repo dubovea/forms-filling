@@ -1,15 +1,16 @@
-import { Input } from "../../ui/input";
 import { ErrorText } from "../error-text";
 import { RequiredSymbol } from "../required-symbol";
 import { ClearButton } from "../clear-button";
-import { FormCalendar } from "./form-calendar";
-import { Controller } from "react-hook-form";
 import { FormInputCheckbox } from "./form-input-checkbox";
 import { FormInputPhone } from "./form-input-phone";
+import { FormInputSelect } from "./form-input-select";
+import { FormInputCalendar } from "./form-input-calendar";
+import { FormInputBase } from "./form-input-base";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   control: any;
   name: string;
+  values?: string[];
   label?: string;
   type?: string;
   required?: boolean;
@@ -21,13 +22,13 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
 export const FormInput: React.FC<Props> = ({
   control,
   name,
+  values,
   label,
   type,
   required,
   className,
   errorText,
   setValue,
-  ...props
 }) => {
   const onClickClear = () => {
     setValue(name, "", { shouldValidate: true }); // очищаем значение
@@ -44,7 +45,7 @@ export const FormInput: React.FC<Props> = ({
   const isDateField = type === "date";
   const isPhoneField = type === "phone";
   const isCheckBoxField = type === "checkbox";
-
+  const isSelectField = type === "select";
   return (
     <div className={className}>
       {label && !isCheckBoxField && (
@@ -57,28 +58,13 @@ export const FormInput: React.FC<Props> = ({
       )}
       <div className="relative">
         {isTextField && (
-          <Controller
-            name={name}
-            control={control}
-            render={({ field }) => (
-              <Input
-                type={isNumberField ? "number" : "text"}
-                disabled={isStatusField}
-                className="h-12 text-md"
-                {...field}
-                {...props}
-              />
-            )}
-          />
+          <FormInputBase control={control} name={name} type={type} />
         )}
-        {isDateField && (
-          <Controller
-            name={name}
-            control={control}
-            render={({ field }) => <FormCalendar field={field} />}
-          />
-        )}
+        {isDateField && <FormInputCalendar control={control} name={name} />}
         {isPhoneField && <FormInputPhone control={control} name={name} />}
+        {isSelectField && (
+          <FormInputSelect control={control} name={name} values={values} />
+        )}
 
         {isTextField && (
           <ClearButton disabled={isStatusField} onClick={onClickClear} />

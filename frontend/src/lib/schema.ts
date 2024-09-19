@@ -10,10 +10,12 @@ export const applicationFormSchema = z.object({
         field: z.string(),
         type: z.string(),
         label: z.string(),
+        format: z.string().optional(),
         value: z.union([z.string(), z.boolean()]), // Поддержка файлов и чекбоксов
+        values: z.array(z.string()).optional(),
       })
       .superRefine((data, ctx) => {
-        const { type, value } = data;
+        const { type, format, value } = data;
         const issue = {
           code: z.ZodIssueCode.custom,
           message: "",
@@ -35,6 +37,10 @@ export const applicationFormSchema = z.object({
         }
         if (type === "phone" && !isValidPhoneNumber(value, "RU")) {
           issue.message = "Неверный формат номера телефона";
+        }
+
+        if (format && value.length !== format.length) {
+          issue.message = `Значение не соответствует формату: [${format}] `;
         }
 
         if (issue.message) {
@@ -73,14 +79,15 @@ export const applicationFormInitial = {
       field: "date_access",
       type: "date",
       label: "Дата обращения",
-      value: "",
+      value: new Date().toLocaleDateString(),
       required: true,
     },
     {
       field: "status",
-      type: "status",
+      type: "select",
       label: "Статус",
       value: "Новый",
+      values: ["Новый", "В обработке", "Действующий", "Закрытый"],
       required: true,
     },
     {
@@ -141,9 +148,10 @@ export const educationFormInitial = {
     },
     {
       field: "form_study",
-      type: "text",
+      type: "select",
       label: "Форма обучения",
-      value: "",
+      value: "Очная",
+      values: ["Очная", "Заочная"],
       required: true,
     },
     {
@@ -156,6 +164,7 @@ export const educationFormInitial = {
     {
       field: "academic_leaves",
       type: "number",
+      format: "X",
       label: "Количество академических отпусков",
       value: "",
       required: true,
@@ -163,8 +172,159 @@ export const educationFormInitial = {
     {
       field: "course",
       type: "number",
+      format: "X",
       label: "Курс",
       value: "",
+      required: true,
+    },
+  ],
+};
+
+export const pasportFormInitial = {
+  files: [], // Пустой массив для файлов
+  fields: [
+    { field: "fio", type: "text", label: "ФИО", value: "", required: true },
+    {
+      field: "date_birth",
+      type: "date",
+      label: "Дата рождения",
+      value: "",
+      required: true,
+    },
+    {
+      field: "place_birth",
+      type: "text",
+      label: "Место рождения",
+      value: "",
+      required: true,
+    },
+    {
+      field: "series",
+      type: "number",
+      label: "Серия",
+      format: "XXXX",
+      value: "",
+      required: true,
+    },
+    {
+      field: "number",
+      type: "number",
+      label: "Номер",
+      format: "XXXXXX",
+      value: "",
+      required: true,
+    },
+    {
+      field: "date_issue",
+      type: "date",
+      label: "Дата выдачи",
+      value: "",
+      required: true,
+    },
+    {
+      field: "Issued_by",
+      type: "text",
+      label: "Кем выдан",
+      value: "",
+      required: true,
+    },
+    {
+      field: "department_code",
+      type: "number",
+      label: "Код подразделения",
+      format: "XXXXXX",
+      value: "",
+      required: true,
+    },
+    {
+      field: "registration_address",
+      type: "text",
+      label: "Адрес регистрации",
+      value: "",
+      required: true,
+    },
+    {
+      field: "address_index",
+      type: "number",
+      format: "XXXXXX",
+      label: "Индекс адреса регистрации",
+      value: "",
+      required: true,
+    },
+  ],
+};
+
+export const workFormInitial = {
+  files: [], // Пустой массив для файлов
+  fields: [
+    { field: "fio", type: "text", label: "ФИО", value: "", required: true },
+    {
+      field: "date_birth",
+      type: "date",
+      label: "Дата рождения",
+      value: "",
+      required: true,
+    },
+    {
+      field: "place_birth",
+      type: "text",
+      label: "Место рождения",
+      value: "",
+      required: true,
+    },
+    {
+      field: "INN",
+      type: "number",
+      label: "ИНН",
+      format: "ХХХХХХХХХХХХ",
+      value: "",
+      required: true,
+    },
+    {
+      field: "SNILS",
+      type: "number",
+      label: "СНИЛС",
+      format: "XXXXXXXXXXX",
+      value: "",
+      required: true,
+    },
+    {
+      field: "medical_policy",
+      type: "number",
+      label: "Полис ОМС",
+      format: "ХХХХХХХХХХХХХХХХ",
+      value: "",
+      required: true,
+    },
+    {
+      field: "gender",
+      type: "select",
+      label: "Пол",
+      value: "Мужской",
+      values: ["Мужской", "Женский"],
+      required: true,
+    },
+    {
+      field: "height",
+      type: "number",
+      label: "Рост",
+      value: "",
+      format: "XXX",
+      required: true,
+    },
+    {
+      field: "clothing_size",
+      type: "text",
+      label: "Размер одежды",
+      value: "",
+      required: true,
+    },
+    {
+      field: "shoe_size",
+      type: "number",
+      label: "Размер обуви",
+      value: "",
+      format: "XX",
       required: true,
     },
   ],
