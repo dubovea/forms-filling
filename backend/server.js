@@ -15,11 +15,10 @@ const upload = multer({ storage: storage });
 const transporter = nodemailer.createTransport({
   service: "yandex",
   auth: {
-    user: "atlets-sport@yandex.ru",
-    pass: "hpcovingoflylfpn",
+    user: process.env.MAIL_TO,
+    pass: process.env.MAIL_PASS,
   },
 });
-
 app.use(
   cors({
     origin: "*",
@@ -30,15 +29,15 @@ app.use(express.json());
 
 app.post("/mail", upload.array("files[]"), async (req, res) => {
   const mailOptions = {
-    from: "atlets-sport@yandex.ru",
+    from: process.env.MAIL_TO,
     to: "gazizov.timur.r@gmail.com", // Фиксированный адрес для получения форм
     subject: req.body.title,
     text: req.body.message,
   };
 
   const mailOptions2 = {
-    from: "atlets-sport@yandex.ru",
-    to: "atlets-sport@yandex.ru", // Фиксированный адрес для получения форм
+    from: process.env.MAIL_TO,
+    to: process.env.MAIL_TO, // Фиксированный адрес для получения форм
     subject: req.body.title,
     text: req.body.message,
   };

@@ -24,22 +24,10 @@ async function fetchEnvData({ envPath, frontendUrl, backendUrl }) {
 const updateEnvFile = async (backendUrl, frontendUrl) => {
   const envFilePath = ".env";
   const frontEnvFilePath = "./frontend/.env";
-  const backendEnvFilePath = "./backend/.env";
-  const botEnvFilePath = "./telegram-bot/.env";
 
   try {
     await fetchEnvData({ envPath: envFilePath, frontendUrl, backendUrl });
     await fetchEnvData({ envPath: frontEnvFilePath, frontendUrl, backendUrl });
-    await fetchEnvData({
-      envPath: backendEnvFilePath,
-      frontendUrl,
-      backendUrl,
-    });
-    await fetchEnvData({
-      envPath: botEnvFilePath,
-      frontendUrl,
-      backendUrl,
-    });
     console.log(".env файл обновлен!");
   } catch (err) {
     console.error("Ошибка при обновлении .env файла:", err.message, err.stack);
@@ -48,9 +36,6 @@ const updateEnvFile = async (backendUrl, frontendUrl) => {
 
 (async function () {
   try {
-    console.log("Авторизация Ngrok...");
-    await ngrok.authtoken(process.env.NGROK_AUTHTOKEN);
-
     console.log("Запуск туннеля для frontend на порту 5173...");
     const frontendUrl = await ngrok.connect(5173);
     console.log(`Ngrok tunnel for frontend: ${frontendUrl}`);
