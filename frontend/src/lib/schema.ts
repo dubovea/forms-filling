@@ -8,9 +8,11 @@ export const applicationFormSchema = z.object({
     z
       .object({
         field: z.string(),
+        hidden: z.boolean().optional(),
         type: z.string(),
         label: z.string(),
         format: z.string().optional(),
+        filePath: z.string().optional(),
         value: z.union([z.string(), z.boolean()]), // Поддержка файлов и чекбоксов
         values: z.array(z.string()).optional(),
       })
@@ -77,6 +79,7 @@ export const applicationFormInitial = {
     },
     {
       field: "date_access",
+      hidden: true,
       type: "date",
       label: "Дата обращения",
       value: new Date().toLocaleDateString(),
@@ -84,6 +87,7 @@ export const applicationFormInitial = {
     },
     {
       field: "status",
+      hidden: true,
       type: "select",
       label: "Статус",
       value: "Новый",
@@ -92,24 +96,17 @@ export const applicationFormInitial = {
     },
     {
       field: "check_application",
-      type: "checkbox",
+      type: "download_file",
       label: "Заявление на вступление",
+      filePath: "/Таблицы для базы данных.xlsx",
       value: false,
-      required: true,
     },
     {
       field: "check_consent",
-      type: "checkbox",
+      type: "download_file",
       label: "Согласие на обработку персональных данных",
+      filePath: "/Шишов Николай.pdf",
       value: false,
-      required: true,
-    },
-    {
-      field: "check_сertificate_study",
-      type: "checkbox",
-      label: "Сертификат об обучении",
-      value: false,
-      required: true,
     },
   ],
 };

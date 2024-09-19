@@ -11,7 +11,7 @@ import { Undo } from "lucide-react";
 
 export default function WorkForm() {
   const navigate = useNavigate();
-  
+
   const methods = useForm({
     resolver: zodResolver(applicationFormSchema),
     defaultValues: workFormInitial,
@@ -44,7 +44,7 @@ export default function WorkForm() {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-row">
-            <Link to="/" className="text-white">
+            <Link to="/" className="text-black">
               <Undo />
             </Link>
             <h2 className="text-xl font-bold mb-4 ml-2">
@@ -53,7 +53,7 @@ export default function WorkForm() {
           </div>
           {fields.map((field, index) => (
             <FormInput
-              className="mb-4"
+              className={cn("mb-4", field.hidden && "hidden")}
               key={field.field}
               label={field.label}
               name={`fields.${index}.value`}

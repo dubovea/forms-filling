@@ -12,6 +12,7 @@ export const FormInputPhone: React.FC<Props> = ({ control, name }) => {
       control={control}
       render={({ field }) => (
         <PhoneInput
+          className="bg-white h-12"
           defaultCountry="RU"
           countries={["RU"]}
           value={field.value}

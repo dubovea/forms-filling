@@ -12,7 +12,7 @@ import { Undo } from "lucide-react";
 
 export default function PasportForm() {
   const navigate = useNavigate();
-  
+
   const methods = useForm({
     resolver: zodResolver(applicationFormSchema),
     defaultValues: pasportFormInitial,
@@ -45,14 +45,14 @@ export default function PasportForm() {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-row">
-            <Link to="/" className="text-white">
+            <Link to="/" className="text-black">
               <Undo />
             </Link>
             <h2 className="text-xl font-bold mb-4 ml-2">Паспортные данные</h2>
           </div>
           {fields.map((field, index) => (
             <FormInput
-              className="mb-4"
+              className={cn("mb-4", field.hidden && "hidden")}
               key={field.field}
               label={field.label}
               name={`fields.${index}.value`}

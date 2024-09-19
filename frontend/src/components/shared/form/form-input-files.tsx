@@ -19,6 +19,7 @@ export const FormInputFiles: React.FC<Props> = ({ control }) => {
           <FormLabel className="h-12 text-md">Приложите файлы</FormLabel>
           <FormControl>
             <Input
+              className="bg-white"
               type="file"
               multiple
               onChange={(e) => {

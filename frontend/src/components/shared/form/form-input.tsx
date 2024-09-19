@@ -6,6 +6,7 @@ import { FormInputPhone } from "./form-input-phone";
 import { FormInputSelect } from "./form-input-select";
 import { FormInputCalendar } from "./form-input-calendar";
 import { FormInputBase } from "./form-input-base";
+import { FormInputDownload } from "./form-input-download";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   control: any;
@@ -17,6 +18,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   errorText: any;
   setValue: any;
   className?: string;
+  filePath?: string;
 }
 
 export const FormInput: React.FC<Props> = ({
@@ -29,6 +31,7 @@ export const FormInput: React.FC<Props> = ({
   className,
   errorText,
   setValue,
+  filePath,
 }) => {
   const onClickClear = () => {
     setValue(name, "", { shouldValidate: true }); // очищаем значение
@@ -46,9 +49,10 @@ export const FormInput: React.FC<Props> = ({
   const isPhoneField = type === "phone";
   const isCheckBoxField = type === "checkbox";
   const isSelectField = type === "select";
+  const isDownloadField = type === "download_file";
   return (
     <div className={className}>
-      {label && !isCheckBoxField && (
+      {label && !isCheckBoxField && !isDownloadField && (
         <p className="font-medium mb-2">
           {label} {required && <RequiredSymbol />}
         </p>
@@ -64,6 +68,10 @@ export const FormInput: React.FC<Props> = ({
         {isPhoneField && <FormInputPhone control={control} name={name} />}
         {isSelectField && (
           <FormInputSelect control={control} name={name} values={values} />
+        )}
+
+        {isDownloadField && (
+          <FormInputDownload label={label} filePath={filePath} />
         )}
 
         {isTextField && (

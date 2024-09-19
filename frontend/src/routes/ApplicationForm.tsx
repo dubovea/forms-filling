@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { sendMail } from "@/lib/mail";
 import { Undo } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 export default function ApplicationForm() {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ export default function ApplicationForm() {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-row">
-            <Link to="/" className="text-white">
+            <Link to="/" className="text-black">
               <Undo />
             </Link>
             <h2 className="text-xl font-bold mb-4 ml-2">
@@ -54,7 +55,7 @@ export default function ApplicationForm() {
           </div>
           {fields.map((field, index) => (
             <FormInput
-              className="mb-4"
+              className={cn("mb-4", field.hidden && "hidden")}
               key={field.field}
               label={field.label}
               name={`fields.${index}.value`}
@@ -64,6 +65,7 @@ export default function ApplicationForm() {
               control={control}
               required={field.required}
               errorText={errors?.fields?.[index]?.value?.message as string}
+              filePath={field.filePath}
             />
           ))}
           <FormInputFiles control={control} />
