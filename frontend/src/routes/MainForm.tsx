@@ -1,38 +1,55 @@
-import { Container } from "@/components/shared/container";
-import {
-  useForm,
-  useFieldArray,
-  FormProvider,
-  FieldValues,
-} from "react-hook-form";
+import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormInput } from "@/components/shared/form";
-import { applicationFormSchema, welcomeFormInitial } from "@/lib/schema";
-import { cn, getDescriptionGroup, groupFieldsByGroup } from "@/lib/utils";
-import { useFormStore } from "@/store/form";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { ModalPersonalData } from "@/components/shared/modal-personal-data";
-import { useNavigate } from "react-router-dom";
+import { FormInput } from "@/components/shared/form";
+import { Container } from "@/components/shared/container";
+import { applicationFormInitial, applicationFormSchema } from "@/lib/schema";
+import toast from "react-hot-toast";
+import { sendMail } from "@/lib/mail";
+import { Home } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { cn, getDescriptionGroup, groupFieldsByGroup } from "@/lib/utils";
 import { MainLabel } from "@/components/shared/main-label";
+import { useFormStore } from "@/store";
+import { FormInputFiles } from "@/components/shared/form/form-input-files";
 
-export default function Home() {
+export default function MainForm() {
   const navigate = useNavigate();
-  const [isModalOpen, setModalOpen] = useState(false);
+  const formData = useFormStore((state) => state.formData);
 
+  applicationFormInitial.fields = applicationFormInitial.fields.map((o) => {
+    if (!formData?.first_name) {
+      return o;
+    }
+    switch (o.field) {
+      case "fio":
+        o.value = `${formData.last_name} ${formData.first_name} ${formData.patronymic}`;
+        break;
+      case "phone_number":
+        o.value = formData.phone_number || "";
+        break;
+      case "date_birth":
+        o.value = formData.date_birth || "";
+        break;
+      case "email":
+        o.value = formData.email || "";
+        break;
+      default:
+        break;
+    }
+    return o;
+  });
   const methods = useForm({
     resolver: zodResolver(applicationFormSchema),
-    defaultValues: welcomeFormInitial,
+    defaultValues: applicationFormInitial,
     mode: "onChange",
   });
-  const setFormData = useFormStore((state) => state.setFormData);
 
   const {
-    watch,
-    control,
     handleSubmit,
+    control,
     setValue,
-    formState: { errors, isValid },
+    formState: { errors },
   } = methods;
 
   const { fields } = useFieldArray({
@@ -41,43 +58,27 @@ export default function Home() {
   });
 
   const groupedFields = groupFieldsByGroup(fields);
-  // Функция отправки данных
-  const onSubmit = (data: FieldValues) => {
-    // Сохраняем данные в Zustand при успешной валидации
-    if (isValid) {
-      const oFields = data.fields.reduce((acc, val) => {
-        acc[val.field] = val.value;
-        return acc;
-      }, {});
-      setFormData(oFields);
-      navigate("/forms");
-    }
+  const onSubmit = async (data: typeof applicationFormInitial) => {
+    const response = await sendMail({
+      data,
+      title: "Вступление в Студеческие отряды Югры",
+    });
+    toast.success(response);
+    navigate("/forms");
   };
 
-  const findCheckBoxPersonal = fields.findIndex(
-    (field) => field.field === "personal_data"
-  );
-
-  const checkbox = watch(`fields.${findCheckBoxPersonal}`);
-  const handleDeclinePersonalData = () => {
-    setValue(`fields.${findCheckBoxPersonal}.value`, false);
-    setModalOpen(false);
-  };
-  const handleAgreePersonalData = () => {
-    setModalOpen(false);
-  };
-
-  useEffect(() => {
-    if (checkbox.value) {
-      setModalOpen(true);
-    }
-  }, [checkbox.value]);
   return (
     <Container>
-      <MainLabel />
+      <MainLabel
+        children={
+          <Link to="/forms" className="text-black">
+            <Home />
+          </Link>
+        }
+      />
       <div className="mb-2">
-        Рады приветствовать в нашем приложение, которое поможет выстроить
-        простой и быстрый способ взаимодействия между нами.
+        В данном разделе можно заполнить всю необходимую информацию и прикрепить
+        соответствующие файлы для передачи в штаб регионального отделения.
       </div>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -109,6 +110,7 @@ export default function Home() {
               </div>
             </div>
           ))}
+          <FormInputFiles control={control} />
           <Button
             className="mt-4 w-full text-lg h-12"
             type="submit"
@@ -118,11 +120,6 @@ export default function Home() {
           </Button>
         </form>
       </FormProvider>
-      <ModalPersonalData
-        isOpen={isModalOpen}
-        onClose={handleDeclinePersonalData}
-        onSubmit={handleAgreePersonalData}
-      />
     </Container>
   );
 }

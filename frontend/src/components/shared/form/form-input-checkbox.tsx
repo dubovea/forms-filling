@@ -15,10 +15,7 @@ export const FormInputCheckbox: React.FC<Props> = ({
   required,
 }) => {
   return (
-    <div className="flex items-center gap-2 justify-between">
-      <p className="font-medium mb-2">
-        {label} {required && <RequiredSymbol />}
-      </p>
+    <div className="flex items-center gap-4 justify-between">
       <Controller
         name={name}
         control={control}
@@ -26,6 +23,9 @@ export const FormInputCheckbox: React.FC<Props> = ({
           <Checkbox checked={field.value} onCheckedChange={field.onChange} />
         )}
       />
+      <p className="mb-2">
+        {label} {required && <RequiredSymbol />}
+      </p>
     </div>
   );
 };

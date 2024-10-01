@@ -53,12 +53,16 @@ export const FormInput: React.FC<Props> = ({
   return (
     <div className={className}>
       {label && !isCheckBoxField && !isDownloadField && (
-        <p className="font-medium mb-2">
-          {label} {required && <RequiredSymbol />}
+        <p className="mb-2">
+          {`${label}:`} {required && <RequiredSymbol />}
         </p>
       )}
       {label && isCheckBoxField && (
-        <FormInputCheckbox control={control} name={name} label={label} />
+        <FormInputCheckbox
+          control={control}
+          name={name}
+          label={label}
+        />
       )}
       <div className="relative">
         {isTextField && (
