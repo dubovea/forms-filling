@@ -15,6 +15,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   type?: string;
   required?: boolean;
+  disabled?: boolean;
   errorText: any;
   setValue: any;
   className?: string;
@@ -28,6 +29,7 @@ export const FormInput: React.FC<Props> = ({
   label,
   type,
   required,
+  disabled,
   className,
   errorText,
   setValue,
@@ -58,28 +60,49 @@ export const FormInput: React.FC<Props> = ({
         </p>
       )}
       {label && isCheckBoxField && (
-        <FormInputCheckbox
-          control={control}
-          name={name}
-          label={label}
-        />
+        <FormInputCheckbox control={control} name={name} label={label} />
       )}
       <div className="relative">
         {isTextField && (
-          <FormInputBase control={control} name={name} type={type} />
+          <FormInputBase
+            control={control}
+            name={name}
+            type={type}
+            disabled={disabled}
+          />
         )}
-        {isDateField && <FormInputCalendar control={control} name={name} />}
-        {isPhoneField && <FormInputPhone control={control} name={name} />}
+        {isDateField && (
+          <FormInputCalendar
+            control={control}
+            name={name}
+            disabled={disabled}
+          />
+        )}
+        {isPhoneField && (
+          <FormInputPhone control={control} name={name} disabled={disabled} />
+        )}
         {isSelectField && (
-          <FormInputSelect control={control} name={name} values={values} />
+          <FormInputSelect
+            control={control}
+            name={name}
+            values={values}
+            disabled={disabled}
+          />
         )}
 
         {isDownloadField && (
-          <FormInputDownload label={label} filePath={filePath} />
+          <FormInputDownload
+            label={label}
+            filePath={filePath}
+            disabled={disabled}
+          />
         )}
 
         {isTextField && (
-          <ClearButton disabled={isStatusField} onClick={onClickClear} />
+          <ClearButton
+            disabled={isStatusField || disabled}
+            onClick={onClickClear}
+          />
         )}
       </div>
 

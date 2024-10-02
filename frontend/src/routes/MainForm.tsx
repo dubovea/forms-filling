@@ -1,44 +1,33 @@
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { FormInput } from "@/components/shared/form";
 import { Container } from "@/components/shared/container";
-import { applicationFormInitial, applicationFormSchema } from "@/lib/schema";
+import {
+  applicationFormInitial,
+  applicationFormSchema,
+  FormValuesType,
+} from "@/lib/schema";
 import toast from "react-hot-toast";
 import { sendMail } from "@/lib/mail";
-import { Home } from "lucide-react";
+import { Undo } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { cn, getDescriptionGroup, groupFieldsByGroup } from "@/lib/utils";
+import { prepareInitialFormData } from "@/lib/utils";
 import { MainLabel } from "@/components/shared/main-label";
 import { useFormStore } from "@/store";
 import { FormInputFiles } from "@/components/shared/form/form-input-files";
+import { FormLayout } from "@/components/shared/form/form-layout";
+import { useNavBack } from "@/hooks/useNavBack";
 
 export default function MainForm() {
+  useNavBack();
   const navigate = useNavigate();
-  const formData = useFormStore((state) => state.formData);
+  const storeData = useFormStore((state) => state.formData);
 
-  applicationFormInitial.fields = applicationFormInitial.fields.map((o) => {
-    if (!formData?.first_name) {
-      return o;
-    }
-    switch (o.field) {
-      case "fio":
-        o.value = `${formData.last_name} ${formData.first_name} ${formData.patronymic}`;
-        break;
-      case "phone_number":
-        o.value = formData.phone_number || "";
-        break;
-      case "date_birth":
-        o.value = formData.date_birth || "";
-        break;
-      case "email":
-        o.value = formData.email || "";
-        break;
-      default:
-        break;
-    }
-    return o;
+  applicationFormInitial.fields = prepareInitialFormData({
+    fields: applicationFormInitial.fields,
+    storeData,
   });
+
   const methods = useForm({
     resolver: zodResolver(applicationFormSchema),
     defaultValues: applicationFormInitial,
@@ -57,14 +46,18 @@ export default function MainForm() {
     control,
   });
 
-  const groupedFields = groupFieldsByGroup(fields);
-  const onSubmit = async (data: typeof applicationFormInitial) => {
+  const onSubmit = async (data: FormValuesType) => {
     const response = await sendMail({
-      data,
-      title: "Вступление в Студеческие отряды Югры",
+      formData: data,
+      storeData,
+      title: "Заявка на вступление вСтудеческие отряды Югры",
     });
-    toast.success(response);
-    navigate("/forms");
+    if (response.valid) {
+      toast.success(response.message);
+      navigate("/forms");
+      return;
+    }
+    toast.error(response.message);
   };
 
   return (
@@ -72,7 +65,7 @@ export default function MainForm() {
       <MainLabel
         children={
           <Link to="/forms" className="text-black">
-            <Home />
+            <Undo />
           </Link>
         }
       />
@@ -82,42 +75,30 @@ export default function MainForm() {
       </div>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {Object.entries(groupedFields).map(([group, groupFields]) => (
-            <div key={group}>
-              {getDescriptionGroup(groupFields) && (
-                <div className="mb-2 font-semibold">
-                  {getDescriptionGroup(groupFields)}
-                </div>
-              )}
-              <div className="flex flex-wrap mb-4">
-                {groupFields.map((field) => (
-                  <div className="flex-1 min-w-[150px] mr-2" key={field.field}>
-                    <FormInput
-                      className={cn(field.hidden && "hidden")}
-                      label={field.label}
-                      name={`fields.${field.index}.value`}
-                      values={field.values}
-                      type={field.type}
-                      setValue={setValue}
-                      control={control}
-                      required={field.required}
-                      errorText={
-                        errors?.fields?.[field.index]?.value?.message as string
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+          <FormLayout
+            fields={fields}
+            setValue={setValue}
+            control={control}
+            errors={errors}
+          />
           <FormInputFiles control={control} />
-          <Button
-            className="mt-4 w-full text-lg h-12"
-            type="submit"
-            size={"lg"}
-          >
-            Продолжить
-          </Button>
+          <div className="flex flex-row gap-4">
+            <Button
+              className="mt-4 w-full text-lg h-12"
+              type="submit"
+              size={"lg"}
+            >
+              Отправить
+            </Button>
+            <Button
+              onClick={() => navigate("/forms")}
+              variant="outline"
+              className="mt-4 w-full text-lg h-12"
+              size={"lg"}
+            >
+              Назад
+            </Button>
+          </div>
         </form>
       </FormProvider>
     </Container>

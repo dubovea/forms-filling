@@ -3,18 +3,20 @@ import {
   useForm,
   useFieldArray,
   FormProvider,
-  FieldValues,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormInput } from "@/components/shared/form";
-import { applicationFormSchema, welcomeFormInitial } from "@/lib/schema";
-import { cn, getDescriptionGroup, groupFieldsByGroup } from "@/lib/utils";
+import {
+  applicationFormSchema,
+  FormValuesType,
+  welcomeFormInitial,
+} from "@/lib/schema";
 import { useFormStore } from "@/store/form";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { ModalPersonalData } from "@/components/shared/modal-personal-data";
 import { useNavigate } from "react-router-dom";
 import { MainLabel } from "@/components/shared/main-label";
+import { FormLayout } from "@/components/shared/form/form-layout";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -40,15 +42,14 @@ export default function Home() {
     control,
   });
 
-  const groupedFields = groupFieldsByGroup(fields);
   // Функция отправки данных
-  const onSubmit = (data: FieldValues) => {
+  const onSubmit = (data: FormValuesType) => {
     // Сохраняем данные в Zustand при успешной валидации
     if (isValid) {
       const oFields = data.fields.reduce((acc, val) => {
         acc[val.field] = val.value;
         return acc;
-      }, {});
+      }, {} as Record<string, string | boolean>);
       setFormData(oFields);
       navigate("/forms");
     }
@@ -60,7 +61,9 @@ export default function Home() {
 
   const checkbox = watch(`fields.${findCheckBoxPersonal}`);
   const handleDeclinePersonalData = () => {
-    setValue(`fields.${findCheckBoxPersonal}.value`, false);
+    setValue(`fields.${findCheckBoxPersonal}.value`, false, {
+      shouldValidate: true,
+    });
     setModalOpen(false);
   };
   const handleAgreePersonalData = () => {
@@ -81,34 +84,12 @@ export default function Home() {
       </div>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {Object.entries(groupedFields).map(([group, groupFields]) => (
-            <div key={group}>
-              {getDescriptionGroup(groupFields) && (
-                <div className="mb-2 font-semibold">
-                  {getDescriptionGroup(groupFields)}
-                </div>
-              )}
-              <div className="flex flex-wrap mb-4">
-                {groupFields.map((field) => (
-                  <div className="flex-1 min-w-[150px] mr-2" key={field.field}>
-                    <FormInput
-                      className={cn(field.hidden && "hidden")}
-                      label={field.label}
-                      name={`fields.${field.index}.value`}
-                      values={field.values}
-                      type={field.type}
-                      setValue={setValue}
-                      control={control}
-                      required={field.required}
-                      errorText={
-                        errors?.fields?.[field.index]?.value?.message as string
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+          <FormLayout
+            fields={fields}
+            setValue={setValue}
+            control={control}
+            errors={errors}
+          />
           <Button
             className="mt-4 w-full text-lg h-12"
             type="submit"

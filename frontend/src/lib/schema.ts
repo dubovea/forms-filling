@@ -1,4 +1,3 @@
-import { group } from "console";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
@@ -11,12 +10,14 @@ export const applicationFormSchema = z.object({
         field: z.string(),
         hidden: z.boolean().optional(),
         required: z.boolean().optional(),
+        disabled: z.boolean().optional(),
         type: z.string(),
         label: z.string(),
+        group: z.string().optional(),
         description: z.string().optional(),
         format: z.string().optional(),
         filePath: z.string().optional(),
-        value: z.union([z.string(), z.boolean()]), // Поддержка файлов и чекбоксов
+        value: z.union([z.string(), z.boolean()]),
         values: z.array(z.string()).optional(),
       })
       .superRefine((data, ctx) => {
@@ -64,8 +65,8 @@ export const applicationFormSchema = z.object({
   ),
 });
 
-export const welcomeFormInitial = {
-  files: [], // Пустой массив для файлов
+export const welcomeFormInitial: FormValuesType = {
+  files: [],
   fields: [
     {
       field: "last_name",
@@ -74,7 +75,6 @@ export const welcomeFormInitial = {
       description: "Расскажи о себе:",
       value: "",
       group: "group1",
-      index: 0,
       required: true,
     },
     {
@@ -83,7 +83,6 @@ export const welcomeFormInitial = {
       label: "Имя",
       value: "",
       group: "group1",
-      index: 1,
       required: true,
     },
     {
@@ -92,7 +91,6 @@ export const welcomeFormInitial = {
       label: "Отчество",
       value: "",
       group: "group2",
-      index: 2,
       required: true,
     },
     {
@@ -101,7 +99,6 @@ export const welcomeFormInitial = {
       label: "Дата рождения",
       value: "",
       group: "group2",
-      index: 3,
       required: true,
     },
     {
@@ -110,14 +107,12 @@ export const welcomeFormInitial = {
       label: "Номер телефона",
       description: "Как нам с тобой связаться:",
       value: "",
-      index: 4,
     },
     {
       field: "email",
       type: "email",
       label: "Электронная почта",
       value: "",
-      index: 5,
     },
     {
       field: "personal_data",
@@ -126,45 +121,43 @@ export const welcomeFormInitial = {
         "Нажимая кнопку «Продолжить», я даю свое согласие на обработку моих персональных данных, в соответствии с Федеральным законом от 27.07.2006 года №152-ФЗ «О персональных данных», на условиях и для целей, определенных в Согласии на обработку персональных данных.",
       format: "Необходимо подтвердить обработку персональных данных",
       value: false,
-      index: 6,
       required: true,
     },
   ],
 };
 
-export const applicationFormInitial = {
-  files: [], // Пустой массив для файлов
+export const applicationFormInitial: FormValuesType = {
+  files: [],
   fields: [
     {
       field: "fio",
       type: "text",
       label: "ФИО",
       value: "",
-      index: 0,
       description: "Общие сведения",
       required: true,
+      disabled: true,
     },
     {
       field: "phone_number",
       type: "phone",
       label: "Номер телефона",
       value: "",
-      index: 1,
       required: true,
+      disabled: true,
     },
     {
       field: "email",
       type: "email",
       label: "Электронная почта",
       value: "",
-      index: 2,
       required: true,
+      disabled: true,
     },
     {
       field: "social_networks",
       type: "text",
       label: "Страницы в соцсетях",
-      index: 3,
       value: "",
     },
     {
@@ -173,21 +166,18 @@ export const applicationFormInitial = {
       label: "Наименование образовательной организации",
       description: "Информация об образовательной организации",
       value: "",
-      index: 4,
     },
     {
       field: "faculty",
       type: "text",
       label: "Факультет",
       value: "",
-      index: 5,
     },
     {
       field: "specialty",
       type: "text",
       label: "Специальность",
       value: "",
-      index: 6,
     },
     {
       field: "date_admission",
@@ -195,7 +185,6 @@ export const applicationFormInitial = {
       label: "Дата поступления",
       group: "group1",
       value: "",
-      index: 7,
     },
     {
       field: "date_end",
@@ -203,7 +192,6 @@ export const applicationFormInitial = {
       label: "Дата окончания",
       group: "group1",
       value: "",
-      index: 8,
     },
     {
       field: "form_study",
@@ -211,7 +199,6 @@ export const applicationFormInitial = {
       label: "Форма обучения",
       group: "group2",
       value: "Очная",
-      index: 9,
       values: ["Очная", "Заочная"],
     },
     {
@@ -221,7 +208,6 @@ export const applicationFormInitial = {
       label: "Курс",
       group: "group2",
       value: "",
-      index: 10,
     },
     {
       field: "date_birth",
@@ -230,7 +216,6 @@ export const applicationFormInitial = {
       group: "group3",
       description: "Паспортные данные",
       value: "",
-      index: 11,
     },
     {
       field: "age",
@@ -239,7 +224,6 @@ export const applicationFormInitial = {
       group: "group3",
       value: "",
       format: "XX",
-      index: 12,
     },
     {
       field: "series",
@@ -248,7 +232,6 @@ export const applicationFormInitial = {
       group: "group4",
       format: "XXXX",
       value: "",
-      index: 13,
     },
     {
       field: "number",
@@ -257,14 +240,12 @@ export const applicationFormInitial = {
       group: "group4",
       format: "XXXXXX",
       value: "",
-      index: 14,
     },
     {
       field: "Issued_by",
       type: "text",
       label: "Кем выдан",
       value: "",
-      index: 15,
     },
     {
       field: "date_issue",
@@ -272,7 +253,6 @@ export const applicationFormInitial = {
       label: "Дата выдачи",
       group: "group5",
       value: "",
-      index: 16,
     },
 
     {
@@ -282,29 +262,25 @@ export const applicationFormInitial = {
       group: "group5",
       format: "XXXXXX",
       value: "",
-      index: 17,
     },
     {
       field: "registration_address",
       type: "text",
       label: "Адрес регистрации",
       value: "",
-      index: 18,
     },
     {
-      field: "address_index",
+      field: "registration_index",
       type: "number",
       format: "XXXXXX",
       label: "Индекс адреса регистрации",
       value: "",
-      index: 19,
     },
     {
       field: "residence_address",
       type: "text",
       label: "Адрес проживания",
       value: "",
-      index: 20,
     },
     {
       field: "INN",
@@ -313,7 +289,6 @@ export const applicationFormInitial = {
       description: "Для участия в трудовых проектах",
       format: "ХХХХХХХХХХХХ",
       value: "",
-      index: 21,
     },
     {
       field: "SNILS",
@@ -321,7 +296,6 @@ export const applicationFormInitial = {
       label: "СНИЛС",
       format: "XXXXXXXXXXX",
       value: "",
-      index: 22,
     },
     {
       field: "medical_policy",
@@ -329,7 +303,6 @@ export const applicationFormInitial = {
       label: "Полис ОМС",
       format: "ХХХХХХХХХХХХХХХХ",
       value: "",
-      index: 23,
     },
     {
       field: "gender",
@@ -337,7 +310,6 @@ export const applicationFormInitial = {
       label: "Пол",
       value: "Мужской",
       values: ["Мужской", "Женский"],
-      index: 24,
     },
     {
       field: "height",
@@ -346,7 +318,6 @@ export const applicationFormInitial = {
       value: "",
       format: "XXX",
       group: "group6",
-      index: 25,
     },
     {
       field: "clothing_size",
@@ -354,7 +325,6 @@ export const applicationFormInitial = {
       label: "Размер одежды",
       group: "group6",
       value: "",
-      index: 26,
     },
     {
       field: "shoe_size",
@@ -363,15 +333,11 @@ export const applicationFormInitial = {
       group: "group6",
       value: "",
       format: "XX",
-      index: 27,
     },
   ],
 };
 
-export const documents = [
-  {
-    label: "Таблицы для базы данных",
-    filePath: "/Таблицы для базы данных.xlsx",
-  },
-  { label: "Шишов Николай", filePath: "/Шишов Николай.pdf" },
-];
+export type FormValuesType = z.infer<typeof applicationFormSchema>;
+export type FieldType = z.infer<
+  typeof applicationFormSchema.shape.fields
+>[number];

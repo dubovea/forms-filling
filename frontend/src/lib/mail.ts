@@ -1,12 +1,42 @@
-export const sendMail = async ({ data, title }) => {
+const prepareMailData = ({ formData, storeData }) => {
+  const oFioField = formData.fields.find((o) => o.field === "fio");
+  const newData = {
+    fields: [
+      {
+        label: "Фамилия",
+        value: storeData.last_name,
+        description: oFioField?.description,
+      },
+      {
+        label: "Имя",
+        value: storeData.first_name,
+      },
+      {
+        label: "Отчество",
+        value: storeData.patronymic,
+      },
+    ],
+    files: formData.files,
+  };
+  formData.fields.forEach(({ field, label, value, description }) => {
+    if (field === "fio") {
+      return;
+    }
+    newData.fields.push({ label, value, description });
+  });
+  return newData;
+};
+
+export const sendMail = async ({ formData, storeData, title }) => {
+  const data = prepareMailData({ formData, storeData });
   const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const formData = new FormData();
+  const formMailData = new FormData();
 
   // Генерация HTML-таблицы с группировкой по description
   const generateTable = (fields) => {
     let html = "<table border='1' cellpadding='5' cellspacing='0'>";
-    let currentDescription = null;
-    let groupedRows = [];
+    let currentDescription = "";
+    const groupedRows = [];
 
     // Группировка полей по description
     fields.forEach((field) => {
@@ -27,7 +57,7 @@ export const sendMail = async ({ data, title }) => {
 
       groupedRows[groupedRows.length - 1].rows.push({
         label,
-        value: fixValue || ""
+        value: fixValue || "",
       });
     });
 
@@ -56,29 +86,38 @@ export const sendMail = async ({ data, title }) => {
     return html;
   };
 
+  // Генерация HTML-таблицы
   const tableHTML = generateTable(data.fields);
 
-  formData.append("title", title);
-  formData.append("message", tableHTML);
-  formData.append("html", tableHTML); // Указываем, что это HTML-формат
+  // Добавляем данные в formData
+  formMailData.append("title", title); // Заголовок письма
+  formMailData.append("message", tableHTML); // Содержимое письма как текст
 
+  // Прикрепляем файлы
   const files = data.files;
   for (let i = 0; i < files.length; i++) {
-    formData.append("files[]", files[i]);
+    formMailData.append("files[]", files[i]);
   }
 
   try {
+    // Отправка запроса
     const response = await fetch(`${VITE_BACKEND_URL}/mail`, {
+      method: "POST",
+      body: formMailData,
       headers: {
         "ngrok-skip-browser-warning": "skip-browser-warning",
-        "Content-Type": "text/html" // Указываем тип контента как HTML
       },
-      method: "POST",
-      body: formData,
-    }).then((o) => o.json());
+    });
 
-    return response.message;
+    const result = await response.json();
+    return {
+      valid: true,
+      message: result.message,
+    };
   } catch (error) {
-    return error.message;
+    return {
+      valid: false,
+      message: "Произошла ошибка при отправке письма. Попробуйте ещё раз.",
+    };
   }
 };

@@ -2,12 +2,12 @@ import { Container } from "@/components/shared/container";
 import { MainLabel } from "@/components/shared/main-label";
 import { Button } from "@/components/ui/button";
 import { formPaths } from "@/constants/form";
-import { useFormStore } from "@/store";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavBack } from "@/hooks/useNavBack";
+import { Link } from "react-router-dom";
 
 export default function Forms() {
-  const navigate = useNavigate();
-  const formData = useFormStore((state) => state.formData);
+  useNavBack();
+
   return (
     <Container>
       <MainLabel />

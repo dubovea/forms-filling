@@ -4,14 +4,20 @@ import { PhoneInput } from "@/components/ui/phone-input";
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
   control: any;
+  disabled?: boolean;
 }
-export const FormInputPhone: React.FC<Props> = ({ control, name }) => {
+export const FormInputPhone: React.FC<Props> = ({
+  control,
+  name,
+  disabled,
+}) => {
   return (
     <Controller
       name={name}
       control={control}
       render={({ field }) => (
         <PhoneInput
+          disabled={disabled}
           className="bg-white h-12"
           defaultCountry="RU"
           countries={["RU"]}

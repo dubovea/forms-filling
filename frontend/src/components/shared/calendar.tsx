@@ -21,7 +21,7 @@ interface Props {
 export const Calendar: React.FC<Props> = ({ field }) => {
   const { value, onChange } = field;
   const [isOpen, setIsOpen] = useState(false);
-  const defaultDate = value ? moment(value, "DD.MM.YYYY") : undefined;
+  const defaultDate = value ? moment(value, "DD.MM.YYYY").toDate() : undefined;
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
     onChange(date.toLocaleDateString()); // Форматируем дату в строку
